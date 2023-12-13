@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Skeleton from "@/app/components/Skeleton";
 import { Issue } from "@prisma/client";
+import toast , {Toaster} from 'react-hot-toast'
 
 const AssigneeSelect = ({issue}: {issue: Issue}) => {
   const { data: users, error, isLoading } = useQuery<User[]>({
@@ -18,7 +19,19 @@ const AssigneeSelect = ({issue}: {issue: Issue}) => {
   if(isLoading) return <Skeleton />
 
   return (
-    <Select.Root defaultValue={issue.assignedToUserId || "unassigned"} onValueChange={(userId) => userId && axios.patch('/api/issues/' + issue.id , {assignedToUserId: userId === "unassigned" ? null : userId })}>
+    <>
+<Select.Root
+  defaultValue={issue.assignedToUserId || "unassigned"}
+  onValueChange={(userId) => {
+    axios
+      .patch('/api/issues/' + issue.id , {
+        assignedToUserId: userId === "unassigned" ? null : userId,
+      })
+      .catch(() => {
+        toast.error("Changes could not be done");
+      });
+  }}
+>
       <Select.Trigger placeholder="Assign..." />
       <Select.Content>
         <Select.Group>
@@ -32,6 +45,8 @@ const AssigneeSelect = ({issue}: {issue: Issue}) => {
         </Select.Group>
       </Select.Content>
     </Select.Root>
+    <Toaster />
+    </>
   );
 };
 
