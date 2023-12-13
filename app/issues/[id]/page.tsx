@@ -26,7 +26,7 @@ const session =  await getServerSession(authOptions);
       <Box>
           { session && (
              <Flex direction="column" gap="4">
-              <AssigneeSelect />
+              <AssigneeSelect issue={issue}/>
           <EditIssueButton issueId={issue.id} />
           <DeleteIssueButton issueId={issue.id} />
         </Flex>
