@@ -17,12 +17,7 @@ const AssigneeSelect = ({issue}: {issue: Issue}) => {
 
   if(error) return null
   if(isLoading) return <Skeleton />
-
-  return (
-    <>
-<Select.Root
-  defaultValue={issue.assignedToUserId || "unassigned"}
-  onValueChange={(userId) => {
+  const assignIssue  = (userId:string) => {
     axios
       .patch('/api/issues/' + issue.id , {
         assignedToUserId: userId === "unassigned" ? null : userId,
@@ -30,7 +25,13 @@ const AssigneeSelect = ({issue}: {issue: Issue}) => {
       .catch(() => {
         toast.error("Changes could not be done");
       });
-  }}
+  }
+
+  return (
+    <>
+<Select.Root
+  defaultValue={issue.assignedToUserId || "unassigned"}
+  onValueChange={assignIssue}
 >
       <Select.Trigger placeholder="Assign..." />
       <Select.Content>
