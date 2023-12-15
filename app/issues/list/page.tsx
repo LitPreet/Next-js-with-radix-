@@ -1,7 +1,7 @@
 import React from "react";
 import { Table } from "@radix-ui/themes";
 import Link from "next/link";
-import {IssueStatusBadge } from "@/app/components/index";
+import { IssueStatusBadge } from "@/app/components/index";
 import prisma from "@/prisma/client";
 import IssueActions from "./IssueActions";
 import { Issue, Status } from "@prisma/client";
@@ -10,7 +10,7 @@ import { ArrowUpIcon } from "@radix-ui/react-icons";
 const IsssuesPage = async ({
   searchParams,
 }: {
-  searchParams: { status: Status , orderBy: keyof Issue};
+  searchParams: { status: Status; orderBy: keyof Issue };
 }) => {
   const columns: { label: string; value: keyof Issue; classname?: string }[] = [
     {
@@ -25,10 +25,13 @@ const IsssuesPage = async ({
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
     : undefined;
+
+  const orderBy = columns.map(column => column.value).includes(searchParams.orderBy) ? { [searchParams.orderBy]: "asc" } : undefined;
   const issues = await prisma.issue.findMany({
     where: {
       status,
     },
+    orderBy,
   });
 
   // await delay(2000)
@@ -39,11 +42,21 @@ const IsssuesPage = async ({
         <Table.Header>
           <Table.Row>
             {columns.map((column) => (
- <Table.ColumnHeaderCell key={column.value} className={column.classname}><Link href={{
-  query: {...searchParams, orderBy: column.value}
- }}>{column.label}</Link>
- {column.value === searchParams.orderBy && <ArrowUpIcon className="inline"/>}
- </Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell
+                key={column.value}
+                className={column.classname}
+              >
+                <Link
+                  href={{
+                    query: { ...searchParams, orderBy: column.value },
+                  }}
+                >
+                  {column.label}
+                </Link>
+                {column.value === searchParams.orderBy && (
+                  <ArrowUpIcon className="inline" />
+                )}
+              </Table.ColumnHeaderCell>
             ))}
           </Table.Row>
         </Table.Header>
